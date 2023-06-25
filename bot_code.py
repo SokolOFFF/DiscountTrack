@@ -1,11 +1,11 @@
 import random
-
 import telebot
 import json
-import sqlite3
+from parsers import wildberries_parser, sbermegamarket_parser, ozon_parser
+from database_functions import add_new_product, add_new_user, user_exists, get_password
 
 CONFIG = json.load(open("config.json", 'r'))
-SHOPS = ['ozon', 'sbermarket', "yandexmarket", "wildberries"]
+SHOPS = ['ozon', 'sbermarket', "wildberries"]
 bot = telebot.TeleBot(CONFIG['BOT_TOKEN'])
 
 
@@ -17,38 +17,6 @@ def generate_password():
     for symbol in generated:
         password = password + symbol
     return password
-
-
-def get_password(id):
-    con = sqlite3.connect(CONFIG['DB_NAME'])
-    cur = con.cursor()
-    cur.execute(f"""SELECT password FROM users WHERE id = ?""", (id,))
-    ret = cur.fetchall()
-    con.close()
-    return ret[0][0]
-
-
-def user_exists(id):
-    con = sqlite3.connect(CONFIG['DB_NAME'])
-    cur = con.cursor()
-    cur.execute(f"""SELECT id FROM users WHERE id = ?""", (id,))
-    ret = cur.fetchall()
-    if len(ret) == 0:
-        con.close()
-        return False
-    else:
-        con.close()
-        return True
-
-
-def add_new_user(id, password):
-    if not user_exists(id):
-        con = sqlite3.connect(CONFIG['DB_NAME'])
-        cur = con.cursor()
-        data = (id, password)
-        cur.execute(f"""INSERT INTO users VALUES (?, ?)""", data)
-        con.commit()
-        con.close()
 
 
 @bot.message_handler(content_types=['text'], commands=['start', 'help'])
@@ -101,21 +69,19 @@ def handle_add_new_product(message):
     bot.register_next_step_handler(msg, receive_product_links)
 
 
-def get_last_id():
-    con = sqlite3.connect(CONFIG['DB_NAME'])
-    cur = con.cursor()
-    r = cur.execute(f"""SELECT id FROM product ORDER BY id DESC LIMIT 1""")
-    last_id = r.fetchone()
-    con.commit()
-    con.close()
-    if last_id is not None:
-        return last_id[0]
-    else:
-        return 0
+def check_link(shop, link):
+    parser = ''
+    if shop == 'sbermarket':
+        parser = sbermegamarket_parser()
+    if shop == 'ozon':
+        parser = ozon_parser()
+    if shop == 'wildberries':
+        parser = wildberries_parser()
 
+    _, price = parser.parse(link)
 
-# TODO: implement
-def check_link(link):
+    if price == -1:
+        return False
     return True
 
 
@@ -124,19 +90,24 @@ def parse_links(text, tg_id):
         text = text.replace('\n', ' ')
         product_name = text.split(' ')[0]
         links = text.split(' ')[1:]
+        if len(links) == 0:
+            return False
         for i in range(0, len(links), 2):
+            bot.send_message(tg_id, text=f'checking {links[i]} link..')
             if links[i] not in SHOPS:
-                return False
-            if not check_link(links[i + 1]):
+                bot.send_message(tg_id, text=f'{links[i]} not in shops list! ❌')
                 return False
 
+            if not check_link(links[i], links[i + 1]):
+                bot.send_message(tg_id,
+                                 text=f'{links[i]} link cannot be parsed. double check your input or choose other link! ❌')
+                return False
+            else:
+                bot.send_message(tg_id, text=f'{links[i]} link is ok! ✅')
+
         for i in range(0, len(links), 2):
-            con = sqlite3.connect(CONFIG['DB_NAME'])
-            cur = con.cursor()
-            data = (links[i + 1], links[i], product_name)
-            cur.execute(f"""INSERT INTO product VALUES ({get_last_id() + 1}, {tg_id}, ?, ?, ?)""", data)
-            con.commit()
-            con.close()
+            add_new_product(tg_id, links[i], links[i + 1], product_name)
+
         return True
 
     except Exception as e:
@@ -150,11 +121,16 @@ def receive_product_links(message):
         return
 
     if parse_links(message.text, message.chat.id):
-        bot.send_message(message.chat.id, text='okay, i added this!')
+        bot.send_message(message.chat.id, text='okay, i added this! ✅')
     else:
         msg = bot.send_message(message.chat.id,
-                               text='sorry, got some problems. please, check your input or type /exit to reset adding')
+                               text='sorry, got some problems. please, double check your input or type /exit to reset adding ❌')
         bot.register_next_step_handler(msg, receive_product_links)
+
+
+def send_alert(tg_id, last_price, new_price, shop, product_name):
+    bot.send_message(tg_id, text=f"product <b><i>{product_name}</i></b> price on {shop} changed <i>{last_price}</i> -> <i>{new_price}</i>",
+                     parse_mode='HTML')
 
 
 bot.polling(none_stop=True)
