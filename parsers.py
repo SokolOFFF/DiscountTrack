@@ -1,3 +1,4 @@
+import time
 from typing import Tuple
 
 from selenium import webdriver
@@ -68,18 +69,24 @@ class wildberries_parser(base_parser):
 
 
 class sbermegamarket_parser(base_parser):
-    def parse(self, url: str) -> float:
+    def parse(self, url: str) -> Tuple[str, int]:
         try:
             self.driver.get(url=url)
-            price = self.driver.find_element(By.CLASS_NAME, "pdp-sales-block__price-final")
-            a = price.text
-            x = ''
-            for i in a:
+            time.sleep(3)
+            try:
+                self.driver.find_element(By.CLASS_NAME, 'header-region-selector-view__footer-ok').click()
+            except Exception as ex:
+                pass
+            price_div = self.driver.find_element(By.CLASS_NAME, "pdp-sales-block__price-final")
+            price_div_text = price_div.text
+            item_price = ''
+            for i in price_div_text:
                 if i == '.' or i == ',' or i.isdigit():
-                    x += i
-            x = x.replace(',', '.')
-            x = float(x)
-            return ' ', x
+                    item_price += i
+            item_price = item_price.replace(',', '.')
+            item_price = float(item_price)
+            return ' ', item_price
+
 
         except Exception as ex:
             print(ex)
