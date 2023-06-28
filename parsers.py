@@ -87,7 +87,6 @@ class sbermegamarket_parser(base_parser):
             item_price = float(item_price)
             return ' ', item_price
 
-
         except Exception as ex:
             print(ex)
             return "-1", -1
