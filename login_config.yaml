@@ -1,0 +1,15 @@
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    '139082132':
+      email: 139082132@gmail.com
+      name: user_139082132
+      password: $2b$12$FwWtgdiP5gJHGcy5h9grHeD5ouriake.pRSWkEd1FrOniW7Ng8Em2
+    '895523414':
+      email: 895523414@gmail.com
+      name: user_895523414
+      password: $2b$12$ny04uHsAPUrghGfPRx6g/eDIao1RKoDwi98OcxswoT2FdgMtF8QgK
+preauthorized: {}
