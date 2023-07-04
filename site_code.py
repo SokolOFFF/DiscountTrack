@@ -8,11 +8,27 @@ st.set_page_config(page_title="Discount Tracker", layout='wide')
 st.markdown(
     """
 <style>
+.css-vcxpl8 {
+background-color: #093472;
+border-radius: 12px;
+border: #093472;
+
+
+}
+
+.css-vcxpl8:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    background-color: #256BD1;
+}
+
 button {
     height: auto;
     padding-top: 10px !important;
     padding-bottom: 10px !important;
+
 }
+
+
 </style>
 """,
     unsafe_allow_html=True,
@@ -62,8 +78,9 @@ if authentication_status:
     col1, col2 = st.columns(2)
     products = sorted(list(set(get_users_products(user_name))))
     for product in products:
-        col1.button(product, on_click=draw_graph, args=(user_name, product, col2), type='primary',
+        col1.button(product , on_click=draw_graph, args=(user_name, product, col2), type='primary',
                     use_container_width=True)
+        
 
 elif authentication_status is False:
     st.error('Username/password is incorrect')
