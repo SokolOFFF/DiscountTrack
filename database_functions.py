@@ -1,6 +1,7 @@
 import sqlite3
 import json
 from recreate_login_config import recreate_login_config
+from github_functions import git_push_data
 
 CONFIG = json.load(open("config.json", 'r'))
 
@@ -36,6 +37,7 @@ def add_new_user(id, password):
         con.commit()
         con.close()
         recreate_login_config()
+        git_push_data()
 
 
 def get_last_id():
@@ -59,6 +61,7 @@ def add_new_product(tg_id, shop, link, product_name):
     cur.execute(f"""INSERT INTO product VALUES (?, ?, ?, ?, ?)""", data)
     con.commit()
     con.close()
+    git_push_data()
 
 
 def add_new_price(product_id, date, price):
@@ -68,6 +71,7 @@ def add_new_price(product_id, date, price):
     cur.execute(f"""INSERT INTO price VALUES (?, ?, ?)""", data)
     con.commit()
     con.close()
+    git_push_data()
 
 
 def get_products():
