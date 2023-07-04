@@ -43,12 +43,9 @@ def handle_start_help(message):
                               "telegram interface to get it!\n\n")
 
 
-# TODO: rewrite commands list
 @bot.message_handler(content_types=['text'], commands=['commands'])
 def handle_commands(message):
-    commands = ['🥺 /help', '🔧 /login', '👤 /show_users', '💳 /id', '🖼 /add_photo', '🪩 /get_random_photo',
-                '📂 /manage_themes', '🎮 /game', '⛅ /weather', '🗓 /schedule', '🗺 /manage_locations',
-                '🏖 /favourite_locations']
+    commands = ['/help', '/commands', '/add_new_product']
     text = 'here are all commands: \n'
     for command in commands:
         text = text + f'{command}\n'
@@ -132,5 +129,5 @@ def send_alert(tg_id, last_price, new_price, shop, product_name):
     bot.send_message(tg_id, text=f"product <b><i>{product_name}</i></b> price on {shop} changed <i>{last_price}</i> -> <i>{new_price}</i>",
                      parse_mode='HTML')
 
-
-bot.polling(none_stop=True)
+if __name__ == "__main__":
+    bot.polling(none_stop=True)
