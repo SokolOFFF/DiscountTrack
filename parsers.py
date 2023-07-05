@@ -95,6 +95,7 @@ class sbermegamarket_parser(base_parser):
             self.driver.close()
             self.driver.quit()
 
+
 class kazanexpress_parser(base_parser):
     def parse(self, url: str) -> Tuple[str, float]:
         try:
@@ -112,7 +113,7 @@ class kazanexpress_parser(base_parser):
             return prod_name, item_price
 
         except Exception as ex:
-            print(ex)
+            print(ex, "aboba")
             return "-1", -1
 
         finally:

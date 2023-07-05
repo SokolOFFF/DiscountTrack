@@ -1,5 +1,5 @@
 import datetime
-from parsers import ozon_parser, wildberries_parser, sbermegamarket_parser
+from parsers import ozon_parser, wildberries_parser, sbermegamarket_parser, kazanexpress_parser, yandex_market_parser
 from database_functions import add_new_price, get_products, get_last_price
 from time import sleep
 from bot_code import send_alert
@@ -17,6 +17,10 @@ def main():
             parser = ozon_parser()
         if shop == 'wildberries':
             parser = wildberries_parser()
+        if shop == 'kazanexpress':
+            parser = kazanexpress_parser()
+        if shop == 'yandexmarket':
+            parser = yandex_market_parser()
         last_price = get_last_price(id)
         _, price = parser.parse(link)
         date = datetime.datetime.now().date()

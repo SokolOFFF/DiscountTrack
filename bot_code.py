@@ -1,11 +1,11 @@
 import random
 import telebot
 import json
-from parsers import wildberries_parser, sbermegamarket_parser, ozon_parser
+from parsers import wildberries_parser, sbermegamarket_parser, ozon_parser, kazanexpress_parser, yandex_market_parser
 from database_functions import add_new_product, add_new_user, user_exists, get_password
 
 CONFIG = json.load(open("config.json", 'r'))
-SHOPS = ['ozon', 'sbermarket', "wildberries"]
+SHOPS = ['ozon', 'sbermarket', "wildberries", "kazanexpress", 'yandexmarket']
 bot = telebot.TeleBot(CONFIG['BOT_TOKEN'])
 
 
@@ -74,9 +74,13 @@ def check_link(shop, link):
         parser = ozon_parser()
     if shop == 'wildberries':
         parser = wildberries_parser()
+    if shop == 'kazanexpress':
+        parser = kazanexpress_parser()
+    if shop == 'yandexmarket':
+        parser = yandex_market_parser()
 
     _, price = parser.parse(link)
-
+    print(price)
     if price == -1:
         return False
     return True
