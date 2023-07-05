@@ -95,6 +95,30 @@ class sbermegamarket_parser(base_parser):
             self.driver.close()
             self.driver.quit()
 
+class kazanexpress_parser(base_parser):
+    def parse(self, url: str) -> Tuple[str, float]:
+        try:
+            self.driver.get(url=url)
+            time.sleep(5)
+            prod_name = self.driver.find_element(By.XPATH, '//*[@id="product-info"]/div[1]/h1').text
+            price_div = self.driver.find_element(By.XPATH, '//*[@id="product-info"]/div[2]/div[4]/div[2]/div[1]/span')
+            price_div_text = price_div.text
+            item_price = ''
+            for i in price_div_text:
+                if i == '.' or i == ',' or i.isdigit():
+                    item_price += i
+            item_price = item_price.replace(',', '.')
+            item_price = float(item_price)
+            return prod_name, item_price
+
+        except Exception as ex:
+            print(ex)
+            return "-1", -1
+
+        finally:
+            self.driver.close()
+            self.driver.quit()
+
 
 if __name__ == '__main__':
     ozon_parser_1 = ozon_parser()
@@ -113,3 +137,9 @@ if __name__ == '__main__':
     #     'https://sbermegamarket.ru/catalog/details/voda-mineralnaya-borjomi-gazirovannaya-v-stekle-05-l-100023379416/')
     #
     # print(price)
+
+    kz_url = 'https://kazanexpress.ru/product/chekhol-dlya-iphone-834902'
+    kz_parser = kazanexpress_parser()
+    name, price = kz_parser.parse(kz_url)
+    print(name)
+    print(price)
