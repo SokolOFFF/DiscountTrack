@@ -9,16 +9,25 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class base_parser:
+    """Parent class for parsers of all marketplaces"""
     def __init__(self):
+        """Default constructor which created a web driver for selenium parser"""
         options = Options()
         self.driver = webdriver.Chrome(options=options)
 
     def parse(self, url):
+        """Function parses a site via provided url. Should be reimplemented in each dependent class"""
         pass
 
 
 class ozon_parser(base_parser):
+    """Ozon market parser. Extends from base parser class"""
     def parse(self, url: str) -> Tuple[str, int]:
+        """
+        Reimplementation of parse function for ozon market. Parses price and name of product using provided url.
+        :param url: url for the product
+        :return: tuple (name, price)
+        """
         try:
             self.driver.get(url)
 
@@ -36,13 +45,24 @@ class ozon_parser(base_parser):
             self.driver.quit()
 
     def _parse_price(self, price: str) -> int:
+        """
+        Parses price from sting to integer.
+        :param price: price in string format.
+        :return: price in integer format.
+        """
         price = price.rsplit(u'\u2009', 1)[0].replace(u'\u2009', '')
 
         return int(price)
 
 
 class wildberries_parser(base_parser):
+    """Wildberries market parser. Extends from base parser class"""
     def parse(self, url: str) -> Tuple[str, int]:
+        """
+        Reimplementation of parse function for wildberries market. Parses price and name of product using provided url.
+        :param url: url for the product
+        :return: tuple (name, price)
+        """
         try:
             self.driver.get(url)
             WebDriverWait(self.driver, 60).until(
@@ -62,6 +82,11 @@ class wildberries_parser(base_parser):
             self.driver.quit()
 
     def _parse_price(self, price: str) -> int:
+        """
+        Parses price from sting to integer.
+        :param price: price in string format.
+        :return: price in integer format.
+        """
         price_parts = price.rsplit(' ', 1)[0]
         merged_price = price_parts.replace(' ', '')
 
@@ -69,7 +94,13 @@ class wildberries_parser(base_parser):
 
 
 class sbermegamarket_parser(base_parser):
+    """Sbermegamarket parser. Extends from base parser class"""
     def parse(self, url: str) -> Tuple[str, int]:
+        """
+        Reimplementation of parse function for sbermegamarket. Parses price and name of product using provided url.
+        :param url: url for the product
+        :return: tuple (name, price)
+        """
         try:
             self.driver.get(url=url)
             time.sleep(3)
@@ -97,7 +128,13 @@ class sbermegamarket_parser(base_parser):
 
 
 class kazanexpress_parser(base_parser):
+    """KazanExpress parser. Extends from base parser class"""
     def parse(self, url: str) -> Tuple[str, float]:
+        """
+        Reimplementation of parse function for kazanexpress market. Parses price and name of product using provided url.
+        :param url: url for the product
+        :return: tuple (name, price)
+        """
         try:
             self.driver.get(url=url)
             time.sleep(5)
@@ -113,7 +150,6 @@ class kazanexpress_parser(base_parser):
             return prod_name, item_price
 
         except Exception as ex:
-            print(ex, "aboba")
             return "-1", -1
 
         finally:
@@ -122,7 +158,13 @@ class kazanexpress_parser(base_parser):
 
 
 class yandex_market_parser(base_parser):
+    """Yandex market parser. Extends from base parser class"""
     def parse(self, url: str) -> Tuple[str, float]:
+        """
+        Reimplementation of parse function for yandex market. Parses price and name of product using provided url.
+        :param url: url for the product
+        :return: tuple (name, price)
+        """
         try:
             self.driver.get(url)
             time.sleep(15)
@@ -159,33 +201,3 @@ class yandex_market_parser(base_parser):
         finally:
             self.driver.close()
             self.driver.quit()
-
-
-if __name__ == '__main__':
-    ozon_parser_1 = ozon_parser()
-    url = ''
-    name, price = ozon_parser_1.parse(url)
-
-    print(name, price)
-
-    # wb_parser = wildberries_parser()
-    # name, price = wb_parser.parse('https://www.wildberries.ru/catalog/118210975/detail.aspx')
-    #
-    # print(name, price)
-
-    # sb_parser = sbermegamarket_parser()
-    # name, price = sb_parser.parse(
-    #     'https://sbermegamarket.ru/catalog/details/voda-mineralnaya-borjomi-gazirovannaya-v-stekle-05-l-100023379416/')
-    #
-    # print(price)
-
-    kz_url = 'https://kazanexpress.ru/product/chekhol-dlya-iphone-834902'
-    kz_parser = kazanexpress_parser()
-    name, price = kz_parser.parse(kz_url)
-    print(name)
-    print(price)
-    ya_url = 'https://market.yandex.ru/product--zefir-assorti-frantsuzskii-desert-kf-kronshtadtskaia-500g/953680543?cpc=3t1aG6RGaUY2vK7_yceTtqUpp0yqAT_hWyTLT-6IYmV190r3Ak3h4XHd5LG0BmWCtKyg7jDa-lN_QaO-ZcO4M8JEKXBIJzIYaUPwB_4XFFMAYz-bmZRkK6uTfPrcRgd72g6Ru4SZ1LrqQKmiRMNN08Om8bBSWCN2z4ufX5bWABPepNYbb1_dVKXw_gmzDEMfDQGLOigr7SLD1GxUZsQZsD4mq1BoGhxeAl9f1-FLWJ8K-DLfcAtekjFcwOE1uGa1zhKXjI3e1gOKrcJ2gLRC6Q%2C%2C&from-show-uid=16885772993429145794700001&sku=101313811940&do-waremd5=akLI3xgCmvKb26Q-Y5QY0Q&sponsored=1&cpa=1'
-    ya_parser = yandex_market_parser()
-    name, price = ya_parser.parse(ya_url)
-    print(name)
-    print(price)

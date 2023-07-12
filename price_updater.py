@@ -6,6 +6,10 @@ from bot_code import send_alert
 
 
 def main():
+    """
+    Function parses prices for all existing products and adds new prices to the database.
+    :return:
+    """
     products = get_products()
     for product in products:
         id, tg_id, link, shop, product_name = product[0], product[1], product[2], product[3], product[4]
@@ -31,6 +35,9 @@ def main():
 
 
 if __name__ == "__main__":
+    """
+    Function which calls 'main' function every day in 10AM to update prices.
+    """
     while True:
         time = datetime.datetime.now().hour
         if time == 10:

@@ -10,6 +10,10 @@ bot = telebot.TeleBot(CONFIG['BOT_TOKEN'])
 
 
 def generate_password():
+    """
+    Function which generates a random password for the user.
+    :return: password in string format
+    """
     symbols = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x',
                'c', 'v', 'b', 'n', 'm', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '?', '*', '$']
     generated = [random.choice(symbols) for i in range(23)]
@@ -21,6 +25,11 @@ def generate_password():
 
 @bot.message_handler(content_types=['text'], commands=['start', 'help'])
 def handle_start_help(message):
+    """
+    Function to handle 'start' and 'help' commands in telegram bot.
+    :param message: message from the user.
+    :return:
+    """
     if message.text == "/start":
         bot.send_message(message.chat.id,
                          text="hi, {0.first_name}!\ni'm <b>{1.first_name}</b>\ni hope i can help you somehow. ❤️".format(
@@ -45,6 +54,11 @@ def handle_start_help(message):
 
 @bot.message_handler(content_types=['text'], commands=['commands'])
 def handle_commands(message):
+    """
+    Function to handle 'commands' command in telegram bot.
+    :param message: message from the user.
+    :return:
+    """
     commands = ['/help', '/commands', '/add_new_product']
     text = 'here are all commands: \n'
     for command in commands:
@@ -54,6 +68,11 @@ def handle_commands(message):
 
 @bot.message_handler(content_types=['text'], commands=['add_new_product'])
 def handle_add_new_product(message):
+    """
+    Function to handle 'add_new_product' command in telegram bot.
+    :param message: message from the user.
+    :return:
+    """
     bot.send_message(message.chat.id,
                      text='okay! send me links for this product and name of product in the following '
                           'format:\n\n*product name*\n*shop name* *link to product*\n*shop name* *link to '
@@ -67,6 +86,12 @@ def handle_add_new_product(message):
 
 
 def check_link(shop, link):
+    """
+    Function checks if the provided link is valid for the curtain market.
+    :param shop: name of shop/market. Ex.: 'sber'.
+    :param link: link to the product provided by the user.
+    :return: True if link is valid, False otherwise.
+    """
     parser = ''
     if shop == 'sbermarket':
         parser = sbermegamarket_parser()
@@ -87,6 +112,12 @@ def check_link(shop, link):
 
 
 def parse_links(text, tg_id):
+    """
+    Function parses links from users message from telegram bot. Adds links to the database if all is good.
+    :param text: text of message from user.
+    :param tg_id: telegram id of user.
+    :return: True if parsed successfully, False otherwise.
+    """
     try:
         text = text.replace('\n', ' ')
         product_name = text.split(' ')[0]
@@ -117,6 +148,11 @@ def parse_links(text, tg_id):
 
 
 def receive_product_links(message):
+    """
+    Function which handles receiving message with provided links from user to parse it later.
+    :param message: message from the telegram user.
+    :return:
+    """
     if message.text == '/exit':
         bot.send_message(message.chat.id, text='okay, got you!')
         return
@@ -130,8 +166,18 @@ def receive_product_links(message):
 
 
 def send_alert(tg_id, last_price, new_price, shop, product_name):
+    """
+    Send alert to the telegram user when the price is changed.
+    :param tg_id: telegram id of the user.
+    :param last_price: last price of the product.
+    :param new_price: new price of the product
+    :param shop: shop/market name.
+    :param product_name: name of the product.
+    :return:
+    """
     bot.send_message(tg_id, text=f"product <b><i>{product_name}</i></b> price on {shop} changed <i>{last_price}</i> -> <i>{new_price}</i>",
                      parse_mode='HTML')
+
 
 if __name__ == "__main__":
     bot.polling(none_stop=True)

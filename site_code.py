@@ -51,6 +51,11 @@ name, authentication_status, user_name = authenticator.login('Login', 'main')
 
 
 def convert_price_history_to_df(price_history):
+    """
+    Function converts price history to the dataframe fot graphs using.
+    :param price_history: price history of some product.
+    :return: dataframe with data.
+    """
     df = {}
     for price in price_history:
         df[price[0]] = price[1]
@@ -58,8 +63,14 @@ def convert_price_history_to_df(price_history):
 
 
 def draw_graph(tg_id, product_name, column):
+    """
+    Function draws graph of prices for curtain product.
+    :param tg_id: telegram id of the user.
+    :param product_name: name of the product.
+    :param column: columns in streamlit site.
+    :return:
+    """
     price_history = get_price_history(tg_id, product_name)
-    # column.text(price_history)
     for site in price_history.keys():
         column.subheader(price_history[site]['shop'])
         if len(price_history[site]['price_history']) == 0:

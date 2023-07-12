@@ -7,6 +7,10 @@ CONFIG = json.load(open("config.json", 'r'))
 
 
 def get_users():
+    """
+    Function gets all users from 'users' table.
+    :return: data from the 'users' table.
+    """
     con = sqlite3.connect(CONFIG['DB_NAME'])
     cur = con.cursor()
     r = cur.execute(f"""SELECT * FROM users""")
@@ -20,6 +24,10 @@ def get_users():
 
 
 def recreate_login_config():
+    """
+    Function recreates 'login_config.yaml' for streamlit site login and authorization.
+    :return:
+    """
     credentials = {
         'usernames':
             {}
